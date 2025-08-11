@@ -1,0 +1,60 @@
+---
+import { profileConfig } from "../config";
+import { url } from "../utils/url-utils";
+
+const currentYear = new Date().getFullYear();
+
+// 计算网站运行时间
+const startDate = new Date("2023-04-08");
+const currentDate = new Date();
+const diffTime = Math.abs(currentDate.getTime() - startDate.getTime());
+
+// 计算天、时、分、秒
+const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 天数
+const diffHours = Math.floor(
+	(diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+); // 小时
+const diffMinutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60)); // 分钟
+const diffSeconds = Math.floor((diffTime % (1000 * 60)) / 1000); // 秒数
+
+// 格式化运行时间显示
+const runningTimeText = `${diffDays}天 ${diffHours}时 ${diffMinutes}分 ${diffSeconds}秒`;
+---
+
+<div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div>
+<div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6">
+    <div class="transition text-50 text-sm text-center">
+        &copy; <span id="copyright-year">{currentYear}</span> {profileConfig.name}. All Rights Reserved. /
+        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('rss.xml')}>RSS</a> /
+        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a><br>
+        Powered by
+        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/ZyPLJ/fuwai_zy">Fuwari</a><br>
+        <span>运行时间：<span id="running-time">{runningTimeText}</span></span> •
+        <a class="transition link text-[var(--primary)] font-medium" href="https://beian.miit.gov.cn" target="_blank">湘ICP备2024053728号</a>
+    </div>
+</div>
+
+<script>
+// 实时更新网站运行时间
+function updateRunningTime() {
+    const startDate = new Date("2023-04-08");
+    const currentDate = new Date();
+    const diffTime = Math.abs(currentDate.getTime() - startDate.getTime());
+    
+    // 计算天、时、分、秒
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+    const diffSeconds = Math.floor((diffTime % (1000 * 60)) / 1000);
+    
+    // 更新显示
+    const runningTimeElement = document.getElementById('running-time');
+    if (runningTimeElement) {
+        runningTimeElement.textContent = `${diffDays}天 ${diffHours}时 ${diffMinutes}分 ${diffSeconds}秒`;
+    }
+}
+
+// 每秒更新一次
+setInterval(updateRunningTime, 1000);
+</script>
