@@ -12,12 +12,12 @@ import NavMenuPanel from "./widget/NavMenuPanel.astro";
 const className = Astro.props.class;
 
 let links: NavBarLink[] = navBarConfig.links.map(
-	(item: NavBarLink | LinkPreset): NavBarLink => {
-		if (typeof item === "number") {
-			return LinkPresets[item];
-		}
-		return item;
-	},
+    (item: NavBarLink | LinkPreset): NavBarLink => {
+        if (typeof item === "number") {
+            return LinkPresets[item];
+        }
+        return item;
+    },
 );
 ---
 <div id="navbar" class="z-50 onload-animation">
@@ -33,6 +33,42 @@ let links: NavBarLink[] = navBarConfig.links.map(
         </a>
         <div class="hidden md:flex">
             {links.map((l) => {
+                if (l.links && l.links.length > 0) {
+                    return (
+                            <div class="relative group">
+                                <div
+                                        aria-label={l.name}
+                                        class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center cursor-pointer"
+                                >
+                                    {l.name}
+                                    <svg
+                                            class="ml-1 w-4 h-4 transition-transform group-hover:rotate-180"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                {/* 下拉菜单 */}
+                                <div
+                                        class="absolute left-0 mt-2 min-w-[8rem] rounded-lg shadow-lg bg-white dark:bg-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+                                >
+                                    {l.links.map((sub) => (
+                                            <a aria-label={sub.name} href={sub.external ? sub.url : url(sub.url)} target={sub.external ? "_blank" : null}
+                                               class="btn-plain scale-animation rounded-lg h-11 px-5 active:scale-95"
+                                            >
+                                                {sub.name}
+                                            </a>
+                                    ))}
+                                </div>
+                            </div>
+                    );
+                }
+
+
                 return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
                           class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
                 >
@@ -62,80 +98,80 @@ let links: NavBarLink[] = navBarConfig.links.map(
 </div>
 
 <script>
-function switchTheme() {
-    if (localStorage.theme === 'dark') {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-    } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-    }
-}
-
-function loadButtonScript() {
-    let switchBtn = document.getElementById("scheme-switch");
-    if (switchBtn) {
-        switchBtn.onclick = function () {
-            switchTheme()
-        };
+    function switchTheme() {
+        if (localStorage.theme === 'dark') {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+        }
     }
 
-    let settingBtn = document.getElementById("display-settings-switch");
-    if (settingBtn) {
-        settingBtn.onclick = function () {
-            let settingPanel = document.getElementById("display-setting");
-            if (settingPanel) {
-                settingPanel.classList.toggle("float-panel-closed");
-            }
-        };
+    function loadButtonScript() {
+        let switchBtn = document.getElementById("scheme-switch");
+        if (switchBtn) {
+            switchBtn.onclick = function () {
+                switchTheme()
+            };
+        }
+
+        let settingBtn = document.getElementById("display-settings-switch");
+        if (settingBtn) {
+            settingBtn.onclick = function () {
+                let settingPanel = document.getElementById("display-setting");
+                if (settingPanel) {
+                    settingPanel.classList.toggle("float-panel-closed");
+                }
+            };
+        }
+
+        let menuBtn = document.getElementById("nav-menu-switch");
+        if (menuBtn) {
+            menuBtn.onclick = function () {
+                let menuPanel = document.getElementById("nav-menu-panel");
+                if (menuPanel) {
+                    menuPanel.classList.toggle("float-panel-closed");
+                }
+            };
+        }
     }
 
-    let menuBtn = document.getElementById("nav-menu-switch");
-    if (menuBtn) {
-        menuBtn.onclick = function () {
-            let menuPanel = document.getElementById("nav-menu-panel");
-            if (menuPanel) {
-                menuPanel.classList.toggle("float-panel-closed");
-            }
-        };
-    }
-}
-
-loadButtonScript();
+    loadButtonScript();
 </script>
 
 {import.meta.env.PROD && <script is:inline define:vars={{scriptUrl: url('/pagefind/pagefind.js')}}>
-async function loadPagefind() {
-    try {
-        const response = await fetch(scriptUrl, { method: 'HEAD' });
-        if (!response.ok) {
-            throw new Error(`Pagefind script not found: ${response.status}`);
+    async function loadPagefind() {
+        try {
+            const response = await fetch(scriptUrl, { method: 'HEAD' });
+            if (!response.ok) {
+                throw new Error(`Pagefind script not found: ${response.status}`);
+                }
+
+            const pagefind = await import(scriptUrl);
+
+            await pagefind.options({
+                excerptLength: 20
+                });
+
+            window.pagefind = pagefind;
+
+            document.dispatchEvent(new CustomEvent('pagefindready'));
+            console.log('Pagefind loaded and initialized successfully, event dispatched.');
+            } catch (error) {
+            console.error('Failed to load Pagefind:', error);
+            window.pagefind = {
+                search: () => Promise.resolve({ results: [] }),
+                options: () => Promise.resolve(),
+                };
+            document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+            console.log('Pagefind load error, event dispatched.');
+            }
         }
 
-        const pagefind = await import(scriptUrl);
-
-        await pagefind.options({
-            excerptLength: 20
-        });
-
-        window.pagefind = pagefind;
-
-        document.dispatchEvent(new CustomEvent('pagefindready'));
-        console.log('Pagefind loaded and initialized successfully, event dispatched.');
-    } catch (error) {
-        console.error('Failed to load Pagefind:', error);
-        window.pagefind = {
-            search: () => Promise.resolve({ results: [] }),
-            options: () => Promise.resolve(),
-        };
-        document.dispatchEvent(new CustomEvent('pagefindloaderror'));
-        console.log('Pagefind load error, event dispatched.');
-    }
-}
-
-if (document.readyState === 'loading') {
+    if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadPagefind);
-} else {
+    } else {
     loadPagefind();
-}
-</script>}
+    }
+        </script>}

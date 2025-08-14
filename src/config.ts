@@ -17,7 +17,7 @@ export const siteConfig: SiteConfig = {
 	},
 	banner: {
 		enable: true,
-		src: "assets/images/banner.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		src: "https://cdn.pljzy.top/banner.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 		// 如果要使用MP4视频，可以这样配置：
 		// src: "/videos/banner-video.mp4", // 视频文件放在 public/videos/ 目录下
 		// type: "video", // 设置为视频类型
@@ -42,8 +42,8 @@ export const siteConfig: SiteConfig = {
 		},
 	],
 	clarity: {
-		enable: false, // 是否启用 Microsoft Clarity 分析
-		projectId: "", // Clarity 项目 ID
+		enable: true, // 是否启用 Microsoft Clarity 分析
+		projectId: "sqce9dy35z", // Clarity 项目 ID
 	},
 	musicPlayer: {
 		enable: true, // 是否启用音乐播放器
@@ -56,6 +56,27 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Archive,
 		LinkPreset.About,
 		LinkPreset.Links,
+		{
+			name: "工具",
+			url: "#",
+			links: [
+				{
+					name: "文件快递柜",
+					url: "https://share.pljzy.top",
+					external: false,
+				},
+				{
+					name: "图片转ico",
+					url: "https://ico.pljzy.top",
+					external: false,
+				},
+			],
+		},
+		{
+			name: "旧站",
+			url: "https://pljzy.top", // Internal links should not include the base path, as it is automatically added
+			external: true, // Show an external link icon and will open in a new tab
+		},
 		{
 			name: "开往🚆",
 			url: "https://www.travellings.cn/go.html", // Internal links should not include the base path, as it is automatically added
