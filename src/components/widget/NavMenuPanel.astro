@@ -9,17 +9,24 @@ interface Props {
 
 const links = Astro.props.links;
 ---
-<div id="nav-menu-panel" class:list={["float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"]}>
+
+<div
+        id="nav-menu-panel"
+        class:list={[
+            "float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"
+        ]}
+>
     {links.map((link) => {
-        if (link.links && link.links.length > 0) {
+        // 如果有子链接，渲染链接组
+		if (link.links && link.links.length > 0) {
             return (
-                    <div>
-                        {/* 主菜单 */}
+                    <div class="link-group">
+                        {/* 主菜单项 */}
                         <a
                                 href={link.external ? link.url : url(link.url)}
-                                class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
-                           hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
+                                class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
                                 target={link.external ? "_blank" : null}
+                                aria-label={link.name}
                         >
                             <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]">
                                 {link.name}
@@ -38,41 +45,53 @@ const links = Astro.props.links;
                             )}
                         </a>
 
-                        {/* 子菜单，整体右移 */}
-                        {link.links.map((sub) => (
+                        {/* 子菜单项 */}
+                        {link.links.map((subLink) => (
                                 <a
-                                        aria-label={sub.name}
-                                        href={sub.external ? sub.url : url(sub.url)}
-                                        target={sub.external ? "_blank" : null}
-                                        class="ml-4 flex items-center py-2 pl-3 pr-1 rounded-lg gap-8
-                               hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
+                                        href={subLink.external ? subLink.url : url(subLink.url)}
+                                        class="ml-4 flex items-center py-2 pl-3 pr-1 rounded-lg gap-8 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
+                                        target={subLink.external ? "_blank" : null}
+                                        aria-label={subLink.name}
                                 >
                                     <div class="transition text-black/60 dark:text-white/60 font-medium group-hover:text-[var(--primary)] group-active:text-[var(--primary)]">
-                                        {sub.name}
+                                        {subLink.name}
                                     </div>
                                 </a>
                         ))}
                     </div>
-            )
+            );
         }
-        return (<a href={link.external ? link.url : url(link.url)} class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
-            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
-        "
-                   target={link.external ? "_blank" : null}
+
+        // 普通链接
+		return (
+                <a
+                        href={link.external ? link.url : url(link.url)}
+                        class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition"
+                        target={link.external ? "_blank" : null}
+                        aria-label={link.name}
                 >
                     <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]">
                         {link.name}
                     </div>
-                {!link.external &&
-                        <Icon name="material-symbols:chevron-right-rounded"
-                              class="transition text-[1.25rem] text-[var(--primary)]"
-                        >
-                        </Icon>}
-                {link.external &&
-                        <Icon name="fa6-solid:arrow-up-right-from-square"
-                              class="transition text-[0.75rem] text-black/25 dark:text-white/25 -translate-x-1"
-                        >
-                        </Icon>}
+                    {!link.external && (
+                            <Icon
+                                    name="material-symbols:chevron-right-rounded"
+                                    class="transition text-[1.25rem] text-[var(--primary)]"
+                            />
+                    )}
+                    {link.external && (
+                            <Icon
+                                    name="fa6-solid:arrow-up-right-from-square"
+                                    class="transition text-[0.75rem] text-black/25 dark:text-white/25 -translate-x-1"
+                            />
+                    )}
                 </a>
-        )})}
+        );
+    })}
 </div>
+
+<style>
+    .link-group {
+        @apply space-y-1;
+    }
+</style>
