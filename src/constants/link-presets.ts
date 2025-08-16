@@ -19,4 +19,8 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		name: i18n(I18nKey.links),
 		url: "/links/",
 	},
+	[LinkPreset.Images]: {
+		name: i18n(I18nKey.images),
+		url: "/images/",
+	},
 };
