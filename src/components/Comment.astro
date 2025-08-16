@@ -3,7 +3,7 @@ import { commentConfig } from "src/config";
 ---
 
 {commentConfig.enable && (
-    <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full mb-4 text-black/80 dark:text-white/80">
+    <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full mb-4 text-black/80 dark:text-white/80" style="overflow: unset">
         <div id="tcomment" class="twikoo-comment"></div>
         <script is:inline define:vars={{ commentConfig }}>
             function initTwikoo() {
