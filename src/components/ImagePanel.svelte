@@ -1,8 +1,8 @@
 <script lang="ts">
 import Icon from "@iconify/svelte";
+import { formatDateI18n } from "@utils/date-utils";
 import { onMount } from "svelte";
 import { imageLibraryConfig } from "../config";
-import { formatDateI18n } from "@utils/date-utils";
 
 interface ImageData {
 	key: string;
@@ -77,6 +77,8 @@ let totalImages = 0;
 let loading = false;
 let error = "";
 let bannerImage: ImageData | null = null;
+let bannerImageLoaded = false;
+let bannerImageError = false;
 
 const API_BASE_URL = imageLibraryConfig.apiBaseUrl;
 const API_TOKEN = imageLibraryConfig.apiToken;
@@ -102,7 +104,7 @@ async function fetchAlbums() {
 			albums = data.data.data;
 			// 设置默认相册
 			if (albums.length > 0) {
-				const defaultAlbum = 
+				const defaultAlbum =
 					albums.find((album) => album.id === DEFAULT_ALBUM_ID) || albums[0];
 				currentAlbum = defaultAlbum;
 				// 获取默认相册的图片
@@ -147,6 +149,7 @@ async function fetchImages(page = 1, albumId?: number) {
 			// 如果是切换相册或者是第一页，更新banner图片
 			if (albumId && page === 1) {
 				bannerImage = images[0] || null;
+				resetBannerImageState(); // 重置banner图片状态
 			}
 		} else {
 			error = data.message || "获取图片失败";
@@ -210,6 +213,21 @@ function getPageNumbers(): number[] {
 	return pages;
 }
 
+function handleBannerImageLoad() {
+	bannerImageLoaded = true;
+	bannerImageError = false;
+}
+
+function handleBannerImageError() {
+	bannerImageError = true;
+	bannerImageLoaded = false;
+}
+
+function resetBannerImageState() {
+	bannerImageLoaded = false;
+	bannerImageError = false;
+}
+
 onMount(() => {
 	fetchAlbums();
 });
@@ -217,7 +235,7 @@ onMount(() => {
 
 <div class="card-base px-8 py-6">
 	<!-- Header -->
-	<div class="mb-6">
+	<div class="mb-6">		
 		<!-- Album Tabs -->
 		{#if albums.length > 0}
 			<div class="flex flex-wrap gap-2 mb-6">
@@ -235,7 +253,7 @@ onMount(() => {
 				{/each}
 			</div>
 		{/if}
-
+		
 		<!-- Banner Image - 使用当前相册的第一张图片 -->
 		{#if loading}
 			<!-- Banner Loading State -->
@@ -256,12 +274,40 @@ onMount(() => {
 		{:else if bannerImage}
 			<div class="gallery-group bg-[var(--card-bg)] rounded-[var(--radius-large)] overflow-hidden transition-all duration-300 hover:shadow-lg mb-6">
 				<div class="gallery-header cursor-pointer relative h-48 overflow-hidden group">
+					<!-- 占位符背景 - 使用图片的主色调或渐变 -->
+					<div class="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 dark:from-gray-700 dark:via-gray-600 dark:to-gray-500 animate-pulse"></div>
+					
 					<img
-							src={bannerImage.links.url}
-							alt={bannerImage.origin_name}
-							class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-							loading="lazy"
+						src={bannerImage.links.url}
+						alt={bannerImage.origin_name}
+						class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+						loading="lazy"
+						fetchpriority="high"
+						decoding="async"
+						on:load={handleBannerImageLoad}
+						on:error={handleBannerImageError}
 					/>
+					
+					<!-- 加载状态指示器 -->
+					{#if !bannerImageLoaded && !bannerImageError}
+						<div class="absolute inset-0 flex items-center justify-center bg-black/20">
+							<div class="flex flex-col items-center gap-3">
+								<div class="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+								<div class="text-white text-sm font-medium">加载中...</div>
+							</div>
+						</div>
+					{/if}
+					
+					<!-- 错误状态 -->
+					{#if bannerImageError}
+						<div class="absolute inset-0 flex items-center justify-center bg-black/40">
+							<div class="text-center text-white">
+								<Icon icon="material-symbols:broken-image" class="w-12 h-12 mx-auto mb-2 opacity-75" />
+								<div class="text-sm">图片加载失败</div>
+							</div>
+						</div>
+					{/if}
+					
 					<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 					<div class="absolute bottom-4 left-4 text-white">
 						<h3 class="text-xl font-bold mb-1">{currentAlbum?.name}</h3>
@@ -274,7 +320,7 @@ onMount(() => {
 				</div>
 			</div>
 		{/if}
-
+		
 		<!-- Current Album Info -->
 		{#if currentAlbum}
 			<p class="text-black/50 dark:text-white/50">
@@ -296,7 +342,7 @@ onMount(() => {
 		<!-- Error State -->
 		<div class="text-center py-12">
 			<div class="text-red-500 text-lg mb-4">{error}</div>
-			<button
+			<button 
 				on:click={() => currentAlbum ? fetchImages(currentPage, currentAlbum.id) : fetchImages(currentPage)}
 				class="btn-card px-6 py-2 rounded-lg"
 			>
@@ -309,7 +355,7 @@ onMount(() => {
 			{#each images as image}
 				<div class="group relative overflow-hidden rounded-lg bg-[var(--card-bg)] shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 mb-6 break-inside-avoid">
 					<!-- Image Container -->
-					<div
+					<div 
 						class="relative overflow-hidden bg-gray-100 dark:bg-gray-800"
 						style="aspect-ratio: {image.width} / {image.height};"
 					>
@@ -319,21 +365,23 @@ onMount(() => {
 							title={image.origin_name}
 							class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
 							loading="lazy"
+							decoding="async"
+							fetchpriority="auto"
 						/>
-
+						
 						<!-- GIF Indicator -->
 						{#if image.extension.toLowerCase() === 'gif'}
 							<div class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full font-medium">
 								GIF
 							</div>
 						{/if}
-
+						
 						<!-- Overlay on hover -->
 						<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
 							<div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-								<a
-									href={image.links.url}
-									target="_blank"
+								<a 
+									href={image.links.url} 
+									target="_blank" 
 									rel="noopener noreferrer"
 									class="btn-card bg-white/90 hover:bg-white text-black px-4 py-2 rounded-lg shadow-lg"
 								>
@@ -343,13 +391,13 @@ onMount(() => {
 							</div>
 						</div>
 					</div>
-
+					
 					<!-- Image Info -->
 					<div class="p-4">
 						<h3 class="font-semibold text-black/75 dark:text-white/75 mb-2 line-clamp-2 group-hover:text-[var(--primary)] transition-colors duration-300">
 							{image.origin_name}
 						</h3>
-
+						
 						<div class="space-y-1 text-sm text-black/50 dark:text-white/50">
 							<div class="flex items-center justify-between">
 								<span>尺寸:</span>
@@ -443,6 +491,7 @@ onMount(() => {
 			</div>
 		{/if}
 	{/if}
+
 </div>
 
 <style>
@@ -451,5 +500,40 @@ onMount(() => {
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
+	}
+	
+	/* Banner 图片加载优化 */
+	.gallery-header img {
+		will-change: opacity, transform;
+	}
+	
+	/* 渐进式加载动画 */
+	@keyframes fadeInScale {
+		from {
+			opacity: 0;
+			transform: scale(1.05);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	
+	.banner-image-loaded {
+		animation: fadeInScale 0.7s ease-out forwards;
+	}
+	
+	/* 占位符动画优化 */
+	.animate-pulse {
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+	}
+	
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
 	}
 </style>
