@@ -2,9 +2,11 @@
 import { getEntry, render } from "astro:content";
 import Comment from "@components/Comment.astro";
 import Markdown from "@components/misc/Markdown.astro";
+import FriendLinks from "@components/widget/FriendLinks.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { friendLinkSections } from "@/data/friend-links";
 
 const linksPost = await getEntry("spec", "links");
 
@@ -19,6 +21,12 @@ const { Content } = await render(linksPost);
 	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
 		<div class="card-base z-10 px-9 py-6 relative w-full">
 			<Markdown class="mt-2">
+				<h1> 友情链接 🔗 </h1>
+				<p>欢迎来到友链页面！这里收集了一些优秀的技术博客和实用网站，希望对大家有所帮助。</p>
+				<p>旧博客友链搬迁完成，如有遗漏，请在下方评论区留言。</p>
+				<hr/>
+				<FriendLinks sections={friendLinkSections} />
+				<hr/>
 				<Content />
 			</Markdown>
 		</div>
