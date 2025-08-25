@@ -4,9 +4,9 @@
 import { definePlugin } from "@expressive-code/core";
 
 export function pluginLanguageBadge() {
-	return definePlugin({
-		name: "Language Badge",
-		baseStyles: () => `
+    return definePlugin({
+        name: "Language Badge",
+        baseStyles: () => `
       [data-language]::before {
         position: absolute;
         z-index: 2;
@@ -14,6 +14,7 @@ export function pluginLanguageBadge() {
         top: 0.5rem;
         padding: 0.1rem 0.5rem;
         content: attr(data-language);
+        font-family: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         font-size: 0.75rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -44,5 +45,5 @@ export function pluginLanguageBadge() {
         }
       }
     `,
-	});
+    });
 }

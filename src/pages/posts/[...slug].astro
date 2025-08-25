@@ -11,7 +11,6 @@ import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 import ImageWrapper from "../../components/misc/ImageWrapper.astro";
-
 import PostMetadata from "../../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
@@ -112,7 +111,7 @@ const jsonLd = {
 
         </div>
     </div>
-
+    
     <Comment />
     
     <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
@@ -137,3 +136,5 @@ const jsonLd = {
         </a>
     </div>
 </MainGridLayout>
+
+
