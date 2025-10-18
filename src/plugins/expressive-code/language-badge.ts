@@ -4,9 +4,9 @@
 import { definePlugin } from "@expressive-code/core";
 
 export function pluginLanguageBadge() {
-    return definePlugin({
-        name: "Language Badge",
-        baseStyles: () => `
+	return definePlugin({
+		name: "Language Badge",
+		baseStyles: () => `
       [data-language]::before {
         position: absolute;
         z-index: 2;
@@ -45,5 +45,5 @@ export function pluginLanguageBadge() {
         }
       }
     `,
-    });
+	});
 }

@@ -5,49 +5,110 @@ const { sections } = Astro.props as { sections: FriendLinkSection[] };
 ---
 
 {sections.map((section) => (
-  <>
-    <h2>{section.title}</h2>
-    <div class="friend-links-grid">
-      {section.items.map((item) => (
-        <div class="friend-link-card">
+<>
+  <h2>{section.title}</h2>
+  <div class="friend-links-grid">
+    {section.items.map((item) => (
+        <div class="friend-link-card" data-url={item.url}>
           <a href={item.url} target="_blank">
             <div class="card-avatar">
-              <img src={item.avatar} alt={item.title} />
+              <img
+                  src={item.avatar}
+                  alt={item.title}
+                  data-image-component="true"
+                  loading="lazy"
+                  decoding="async"
+                  fetchpriority="auto"
+              />
+              <!-- 进度条状态指示器 -->
+              <div class="status-indicator" data-status="unknown">
+                <div class="progress-bar"></div>
+              </div>
             </div>
             <h3 class="card-title">{item.title}</h3>
             <p class="card-desc">{item.desc}</p>
           </a>
         </div>
-      ))}
-    </div>
-  </>
-))}
+    ))}
+  </div>
+</>
+    ))}
 
-<style>
-.friend-links-grid {
+<div class="status-controls">
+  <button id="checkAllBtn" class="status-btn">
+    <div class="btn-content normal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+      </svg>
+      检测所有友链
+    </div>
+    <div class="btn-content loading">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2v4"></path>
+        <path d="m16.2 7.8 2.9-2.9"></path>
+        <path d="M18 12h4"></path>
+        <path d="m16.2 16.2 2.9 2.9"></path>
+        <path d="M12 18v4"></path>
+        <path d="m4.9 19.1 2.9-2.9"></path>
+        <path d="M2 12h4"></path>
+        <path d="m4.9 4.9 2.9 2.9"></path>
+      </svg>
+      检测中...
+    </div>
+  </button>
+  <!-- <button id="resetBtn" class="status-btn secondary">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+      <path d="M3 3v5h5"></path>
+    </svg>
+    重置状态
+  </button> -->
+</div>
+
+<div class="status-stats">
+  <div class="stat-item">
+    <span class="stat-label">总计:</span>
+    <span id="totalCount">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">在线:</span>
+    <span id="onlineCount" class="stat-online">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">离线:</span>
+    <span id="offlineCount" class="stat-offline">0</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">检测中:</span>
+    <span id="checkingCount" class="stat-checking">0</span>
+  </div>
+</div>
+
+<style lang="scss">
+  .friend-links-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 2rem;
     justify-items: center;
     padding: 2rem 0;
-}
+  }
 
-.friend-link-card {
+  .friend-link-card {
     text-align: center;
     transition: transform 0.25s ease;
-}
+  }
 
-.friend-link-card:hover {
+  .friend-link-card:hover {
     transform: translateY(-4px);
-}
+  }
 
-.friend-link-card a {
+  .friend-link-card a {
     text-decoration: none !important;
     color: inherit;
     display: block;
-}
+  }
 
-.card-avatar {
+  .card-avatar {
     width: 72px;
     height: 72px;
     border-radius: 16px;
@@ -55,27 +116,72 @@ const { sections } = Astro.props as { sections: FriendLinkSection[] };
     margin: 0 auto 0.75rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     transition: transform 0.3s ease;
-}
+    position: relative;
+  }
 
-.friend-link-card:hover .card-avatar {
+  .friend-link-card:hover .card-avatar {
     transform: scale(1.05);
-}
+  }
 
-.card-avatar img {
+  .card-avatar img {
     width: 100%;
     height: 100%;
     margin:0;
     padding:0;
     pointer-events: none;
-}
+  }
 
-.card-title {
+  /* 进度条状态指示器样式 */
+  .status-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .status-indicator[data-status="online"] .progress-bar {
+    width: 100%;
+    background: #4CAF50;
+  }
+
+  .status-indicator[data-status="offline"] .progress-bar {
+    width: 100%;
+    background: #f44336;
+  }
+
+  .status-indicator[data-status="checking"] .progress-bar {
+    width: 100%;
+    background: #FFC107;
+    animation: progressPulse 1.5s infinite;
+  }
+
+  .status-indicator[data-status="unknown"] .progress-bar {
+    width: 0%;
+    background: #9E9E9E;
+  }
+
+  @keyframes progressPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .card-title {
     font-size: 1rem;
     font-weight: 600;
     margin: 0.25rem 0;
-}
+  }
 
-.card-desc {
+  .card-desc {
     font-size: 0.70rem;
     color:  #808080;
     margin: 0;
@@ -85,35 +191,612 @@ const { sections } = Astro.props as { sections: FriendLinkSection[] };
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+  }
 
-@media (max-width: 768px) {
+  /* 控制按钮样式 */
+  .status-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .status-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius, 8px);
+    background: var(--primary);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .status-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .status-btn:hover::before {
+    left: 100%;
+  }
+
+  .status-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px oklch(0.70 0.14 var(--hue) / 0.3);
+    background: oklch(0.65 0.16 var(--hue));
+  }
+
+  .status-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    background: oklch(0.50 0.08 var(--hue));
+  }
+
+  .status-btn:disabled:not(.loading) {
+    transform: none;
+  }
+
+  .status-btn:disabled::before {
+    display: none;
+  }
+
+  /* 按钮内容控制 */
+  .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-content.loading {
+    display: none;
+  }
+
+  .status-btn.loading .btn-content.normal {
+    display: none;
+  }
+
+  .status-btn.loading .btn-content.loading {
+    display: flex;
+  }
+
+  .status-btn.loading .btn-content.loading svg {
+    animation: spin 1s linear infinite;
+    transform-origin: center;
+    filter: drop-shadow(0 0 4px oklch(0.70 0.14 var(--hue) / 0.5));
+  }
+
+  .status-btn.loading {
+    background: oklch(0.60 0.15 var(--hue));
+    box-shadow: 0 2px 12px oklch(0.60 0.15 var(--hue) / 0.4);
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .status-btn.secondary {
+    background: #6b7280;
+  }
+
+  .status-btn.secondary:hover {
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+  }
+
+  /* 统计信息样式 */
+  .status-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .stat-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .stat-online {
+    color: #4CAF50;
+    font-weight: 600;
+  }
+
+  .stat-offline {
+    color: #f44336;
+    font-weight: 600;
+  }
+
+  .stat-checking {
+    color: #FFC107;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
     .friend-links-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+      grid-template-columns: 1fr;
+      gap: 1rem;
     }
-    
+
     .card-avatar {
-        width: 70px;
-        height: 70px;
+      width: 70px;
+      height: 70px;
     }
-    
-    .card-info {
-        padding: 0.875rem 1rem;
-    }
-}
 
-:root.dark .friend-link-card {
+    .status-controls {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .status-btn {
+      width: 100%;
+      max-width: 200px;
+      justify-content: center;
+    }
+
+    .status-stats {
+      gap: 1rem;
+    }
+
+    .stat-item {
+      font-size: 0.8rem;
+    }
+  }
+
+  :root.dark .friend-link-card {
     border-color: #333;
-}
+  }
 
-:root.dark .friend-link-card:hover {
+  :root.dark .friend-link-card:hover {
     box-shadow: 0 8px 25px rgba(255, 255, 255, 0.05);
-}
+  }
 
-:root.dark .card-desc {
+  :root.dark .card-desc {
     color: #FFFFFF;
-}
+  }
+
+  :root.dark .status-stats {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  :root.dark .stat-label {
+    color: #9ca3af;
+  }
+
+  /* 暗色主题下的按钮优化 */
+  :root.dark .status-btn {
+    background: oklch(0.75 0.14 var(--hue));
+    color: oklch(0.95 0.01 var(--hue));
+  }
+
+  :root.dark .status-btn:hover {
+    background: oklch(0.80 0.16 var(--hue));
+    box-shadow: 0 4px 20px oklch(0.75 0.14 var(--hue) / 0.4);
+  }
+
+  :root.dark .status-btn:disabled {
+    background: oklch(0.60 0.08 var(--hue));
+  }
+
+  :root.dark .status-btn.loading {
+    background: oklch(0.70 0.15 var(--hue));
+    box-shadow: 0 2px 12px oklch(0.70 0.15 var(--hue) / 0.5);
+  }
+
+  :root.dark .status-btn.loading .btn-content.loading svg {
+    filter: drop-shadow(0 0 6px oklch(0.75 0.14 var(--hue) / 0.6));
+  }
 </style>
 
+<script is:inline>
+  (function() {
+    function initFriendLinkChecker() {
+      // 状态常量
+      const STATUS = {
+        UNKNOWN: 'unknown',
+        CHECKING: 'checking',
+        ONLINE: 'online',
+        OFFLINE: 'offline'
+      };
 
+      // 存储键名
+      const STORAGE_KEY = 'friendLinksStatus';
+
+      // 性能检测和并发控制
+      class PerformanceManager {
+        constructor() {
+          this.optimalBatchSize = 3;
+          this.isPerformanceTested = false;
+        }
+
+        static getInstance() {
+          if (!PerformanceManager.instance) {
+            PerformanceManager.instance = new PerformanceManager();
+          }
+          return PerformanceManager.instance;
+        }
+
+        // 检测设备性能并确定最优并发数
+        async detectOptimalBatchSize() {
+          if (this.isPerformanceTested) {
+            return this.optimalBatchSize;
+          }
+
+          try {
+            // 基于硬件并发数和网络状况动态调整
+            const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+            const connection = navigator.connection;
+
+            let baseBatchSize = Math.min(hardwareConcurrency, 12); // 最大不超过12
+
+            // 根据网络状况调整
+            if (connection) {
+              if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                baseBatchSize = 1;
+              } else if (connection.effectiveType === '3g') {
+                baseBatchSize = Math.min(baseBatchSize, 6);
+              } else if (connection.effectiveType === '4g') {
+                baseBatchSize = Math.min(baseBatchSize, 12);
+              }
+            }
+
+            this.optimalBatchSize = baseBatchSize;
+            this.isPerformanceTested = true;
+
+            console.log(`性能检测完成，最优并发数: ${this.optimalBatchSize}`);
+            return this.optimalBatchSize;
+
+          } catch (error) {
+            console.warn('性能检测失败，使用默认并发数:', error);
+            this.optimalBatchSize = 3;
+            this.isPerformanceTested = true;
+            return this.optimalBatchSize;
+          }
+        }
+
+        getOptimalBatchSize() {
+          return this.optimalBatchSize;
+        }
+      }
+
+      // 防抖存储管理器
+      class DebouncedStorage {
+        constructor() {
+          this.saveTimeout = null;
+          this.pendingData = null;
+          this.DEBOUNCE_DELAY = 500; // 500ms 防抖延迟
+        }
+
+        static getInstance() {
+          if (!DebouncedStorage.instance) {
+            DebouncedStorage.instance = new DebouncedStorage();
+          }
+          return DebouncedStorage.instance;
+        }
+
+        // 防抖保存状态
+        debouncedSave(statusData) {
+          this.pendingData = { ...this.pendingData, ...statusData };
+
+          if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+          }
+
+          this.saveTimeout = setTimeout(() => {
+            this.saveToStorage();
+          }, this.DEBOUNCE_DELAY);
+        }
+
+        // 立即保存（用于重要状态变更）
+        immediateSave(statusData) {
+          if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = null;
+          }
+          this.pendingData = { ...this.pendingData, ...statusData };
+          this.saveToStorage();
+        }
+
+        saveToStorage() {
+          if (!this.pendingData) return;
+
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.pendingData));
+            this.pendingData = null;
+          } catch (error) {
+            console.warn('无法保存状态到本地存储:', error);
+          }
+        }
+
+        // 清除存储
+        clearStorage() {
+          if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+            this.saveTimeout = null;
+          }
+          this.pendingData = null;
+
+          try {
+            localStorage.removeItem(STORAGE_KEY);
+          } catch (error) {
+            console.warn('无法清除本地存储:', error);
+          }
+        }
+      }
+
+      // DOM元素
+      let checkAllBtn, resetBtn, totalCount, onlineCount, offlineCount, checkingCount;
+
+      // 存储相关函数
+      function saveStatusToStorage(immediate = false) {
+        const statusData = {};
+        const statusIndicators = document.querySelectorAll('.status-indicator');
+
+        statusIndicators.forEach((indicator) => {
+          const cardElement = indicator.closest('.friend-link-card');
+          const url = cardElement?.getAttribute('data-url');
+          const status = indicator.getAttribute('data-status');
+
+          if (url && status && status !== STATUS.UNKNOWN) {
+            statusData[url] = status;
+          }
+        });
+
+        const storage = DebouncedStorage.getInstance();
+        if (immediate) {
+          storage.immediateSave(statusData);
+        } else {
+          storage.debouncedSave(statusData);
+        }
+      }
+
+      function clearStatusStorage() {
+        const storage = DebouncedStorage.getInstance();
+        storage.clearStorage();
+      }
+
+      // 立即加载状态（在DOM解析完成后立即执行）
+      function loadStatusImmediately() {
+        try {
+          const storedData = localStorage.getItem(STORAGE_KEY);
+          if (!storedData) return;
+
+          const statusData = JSON.parse(storedData);
+
+          // 使用微任务确保DOM已解析但不会阻塞渲染
+          Promise.resolve().then(() => {
+            Object.entries(statusData).forEach(([url, status]) => {
+              const cardElement = document.querySelector(`.friend-link-card[data-url="${url}"]`);
+              const statusIndicator = cardElement?.querySelector('.status-indicator');
+
+              if (statusIndicator && Object.values(STATUS).includes(status)) {
+                statusIndicator.setAttribute('data-status', status);
+              }
+            });
+
+            updateStats();
+          });
+        } catch (error) {
+          console.warn('无法从本地存储加载状态:', error);
+        }
+      }
+
+      // 检测单个链接
+      async function checkSingleLink(cardElement) {
+        const url = cardElement.getAttribute('data-url');
+        const statusIndicator = cardElement.querySelector('.status-indicator');
+
+        if (!url || !statusIndicator) return;
+
+        // 设置检测中状态（立即保存，因为这是重要状态变更）
+        setLinkStatus(statusIndicator, STATUS.CHECKING, true);
+
+        try {
+          // 先尝试 favicon 检测（更快，资源消耗更少）
+          await checkWithFavicon(url);
+          setLinkStatus(statusIndicator, STATUS.ONLINE);
+        } catch (faviconError) {
+          try {
+            // favicon 失败后，再尝试 fetch 检测
+            await checkWithFetch(url);
+            setLinkStatus(statusIndicator, STATUS.ONLINE);
+          } catch (fetchError) {
+            // 两种方法都失败，标记为离线
+            setLinkStatus(statusIndicator, STATUS.OFFLINE);
+          }
+        }
+      }
+
+      // 使用 favicon 检测（带超时控制）
+      function checkWithFavicon(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const timeout = setTimeout(() => {
+            reject(new Error('Favicon timeout'));
+          }, 3000); // 3秒超时
+
+          img.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error('Favicon load failed'));
+          };
+          img.src = `${url}/favicon.ico`;
+        });
+      }
+
+      // 使用 fetch 检测（带超时控制）
+      function checkWithFetch(url) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+
+        return fetch(url, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-cache',
+          signal: controller.signal
+        }).then(() => {
+          clearTimeout(timeoutId);
+        }).catch((error) => {
+          clearTimeout(timeoutId);
+          throw error;
+        });
+      }
+
+      // 设置链接状态并更新统计
+      function setLinkStatus(statusIndicator, status, immediate = false) {
+        statusIndicator.setAttribute('data-status', status);
+        updateStats();
+        saveStatusToStorage(immediate);
+      }
+
+      // 检测所有链接
+      async function checkAllLinks() {
+        if (!checkAllBtn) return;
+
+        const button = checkAllBtn;
+
+        // 禁用按钮并显示加载状态
+        button.disabled = true;
+        button.classList.add('loading');
+
+        try {
+          const linkCards = Array.from(document.querySelectorAll('.friend-link-card'));
+
+          // 获取最优并发数
+          const performanceManager = PerformanceManager.getInstance();
+          const optimalBatchSize = await performanceManager.detectOptimalBatchSize();
+
+          // 使用智能并发控制
+          await processInBatches(linkCards, optimalBatchSize);
+
+        } finally {
+          // 恢复按钮状态
+          button.disabled = false;
+          button.classList.remove('loading');
+        }
+      }
+
+      // 批量处理链接检测
+      async function processInBatches(items, batchSize) {
+        for (let i = 0; i < items.length; i += batchSize) {
+          const batch = items.slice(i, i + batchSize);
+
+          // 并发处理当前批次
+          await Promise.all(batch.map(card => checkSingleLink(card)));
+
+          // 如果不是最后一批，添加动态延迟（基于批次大小调整）
+          if (i + batchSize < items.length) {
+            const delay = Math.max(100, 300 - (batchSize * 50)); // 批次越大，延迟越短
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      }
+
+      // 重置所有状态
+      function resetAllStatus() {
+        const statusIndicators = document.querySelectorAll('.status-indicator');
+        statusIndicators.forEach((indicator) => {
+          indicator.setAttribute('data-status', STATUS.UNKNOWN);
+        });
+        updateStats();
+        clearStatusStorage(); // 清除存储的状态
+      }
+
+      // 更新统计信息
+      function updateStats() {
+        const statusIndicators = document.querySelectorAll('.status-indicator');
+
+        let online = 0;
+        let offline = 0;
+        let checking = 0;
+
+        statusIndicators.forEach((indicator) => {
+          const status = indicator.getAttribute('data-status');
+          switch(status) {
+            case STATUS.ONLINE: online++; break;
+            case STATUS.OFFLINE: offline++; break;
+            case STATUS.CHECKING: checking++; break;
+          }
+        });
+
+        if (onlineCount) onlineCount.textContent = online.toString();
+        if (offlineCount) offlineCount.textContent = offline.toString();
+        if (checkingCount) checkingCount.textContent = checking.toString();
+      }
+
+      // 初始化应用
+      function init() {
+        // 获取DOM元素引用
+        checkAllBtn = document.getElementById('checkAllBtn');
+        resetBtn = document.getElementById('resetBtn');
+        totalCount = document.getElementById('totalCount');
+        onlineCount = document.getElementById('onlineCount');
+        offlineCount = document.getElementById('offlineCount');
+        checkingCount = document.getElementById('checkingCount');
+
+        // 计算总链接数
+        const totalLinks = document.querySelectorAll('.friend-link-card').length;
+        if (totalCount) totalCount.textContent = totalLinks.toString();
+
+        // 事件监听
+        checkAllBtn?.addEventListener('click', checkAllLinks);
+        resetBtn?.addEventListener('click', resetAllStatus);
+
+        // 加载存储的状态
+        loadStatusImmediately();
+      }
+
+      // 返回公共方法
+      return {
+        init: init,
+        checkAllLinks: checkAllLinks,
+        resetAllStatus: resetAllStatus,
+        updateStats: updateStats
+      };
+    }
+
+    // 创建全局实例并初始化
+    if (!window.friendLinkChecker) {
+      window.friendLinkChecker = initFriendLinkChecker();
+
+      // 在DOM加载完成后初始化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          window.friendLinkChecker.init();
+        });
+      } else {
+        window.friendLinkChecker.init();
+      }
+    }else {
+      window.friendLinkChecker.init();
+    }
+  })();
+</script>
