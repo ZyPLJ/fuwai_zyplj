@@ -653,7 +653,7 @@ const { sections } = Astro.props as { sections: FriendLinkSection[] };
       }
 
       // 使用 fetch 检测（带超时控制）
-      function checkWithFetch(url) {
+      async function checkWithFetch(url) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
 

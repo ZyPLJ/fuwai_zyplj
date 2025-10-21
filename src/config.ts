@@ -55,7 +55,11 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Home,
 		LinkPreset.Archive,
 		LinkPreset.About,
-		LinkPreset.Links,
+		{
+			name: "社交",
+			url: "/links/",
+			children: [LinkPreset.Links],
+		},
 		// LinkPreset.Images, // 如果没有lsky.pro图床，则注释掉 https://docs.lsky.pro/archive/free/v2/
 		{
 			name: "开往🚆",

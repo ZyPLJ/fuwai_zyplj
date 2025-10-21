@@ -1,0 +1,241 @@
+---
+import { Icon } from "astro-icon/components";
+import { LinkPresets } from "../../constants/link-presets";
+import { LinkPreset, type NavBarLink } from "../../types/config";
+import { url } from "../../utils/url-utils";
+
+interface Props {
+	link: NavBarLink;
+	class?: string;
+}
+
+const { link, class: className } = Astro.props;
+
+// 转换子菜单中的LinkPreset为NavBarLink
+const processedLink = {
+	...link,
+	children: link.children?.map((child: NavBarLink | LinkPreset): NavBarLink => {
+		if (typeof child === "number") {
+			return LinkPresets[child];
+		}
+		return child;
+	}),
+};
+
+const hasChildren = processedLink.children && processedLink.children.length > 0;
+---
+
+<div class:list={["dropdown-container", className]} data-dropdown>
+	{hasChildren ? (
+		<button 
+			class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95 dropdown-trigger"
+			aria-expanded="false"
+			aria-haspopup="true"
+			data-dropdown-trigger
+		>
+			<div class="flex items-center">
+				{processedLink.name}
+				<Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition-transform duration-200 dropdown-arrow ml-1" />
+			</div>
+		</button>
+		<div class="dropdown-menu" data-dropdown-menu>
+			<div class="dropdown-content">
+				{processedLink.children?.map((child) => (
+					<a 
+						href={child.external ? child.url : url(child.url)} 
+						target={child.external ? "_blank" : null}
+						class="dropdown-item"
+						aria-label={child.name}
+					>
+						<div class="flex items-center">
+							<span>{child.name}</span>
+						</div>
+						{child.external && (
+							<Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.75rem] text-black/25 dark:text-white/25" />
+						)}
+					</a>
+				))}
+			</div>
+		</div>
+	) : (
+		<a 
+			aria-label={processedLink.name} 
+			href={processedLink.external ? processedLink.url : url(processedLink.url)} 
+			target={processedLink.external ? "_blank" : null}
+			class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
+		>
+			<div class="flex items-center">
+				{processedLink.name}
+				{processedLink.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]" />}
+			</div>
+		</a>
+	)}
+</div>
+
+<style>
+	.dropdown-container {
+		@apply relative;
+	}
+
+	.dropdown-menu {
+		@apply absolute top-full left-0 pt-2 opacity-0 invisible pointer-events-none transition-all duration-200 ease-out transform translate-y-[-8px] z-50;
+	}
+
+	.dropdown-container:hover .dropdown-menu,
+	.dropdown-container:focus-within .dropdown-menu {
+		@apply opacity-100 visible pointer-events-auto translate-y-0;
+	}
+
+	.dropdown-container:hover .dropdown-arrow,
+	.dropdown-container:focus-within .dropdown-arrow {
+		@apply rotate-180;
+	}
+
+	.dropdown-content {
+		@apply bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-xl dark:shadow-none border border-black/5 dark:border-white/10 py-2 min-w-[12rem];
+	}
+
+	.dropdown-item {
+		@apply flex items-center justify-between px-4 py-2.5 text-black/75 dark:text-white/75 hover:text-[var(--primary)] hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-150 font-medium;
+	}
+
+	.dropdown-item:first-child {
+		@apply rounded-t-[calc(var(--radius-large)-0.5rem)];
+	}
+
+	.dropdown-item:last-child {
+		@apply rounded-b-[calc(var(--radius-large)-0.5rem)];
+	}
+
+	/* 移动端隐藏下拉菜单 */
+	@media (max-width: 768px) {
+		.dropdown-container {
+			@apply hidden;
+		}
+	}
+</style>
+
+<script>
+    // 键盘导航支持
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropdowns = document.querySelectorAll('[data-dropdown]');
+
+        // 点击外部关闭下拉菜单
+        const handleDocumentClick = (e: Event) => {
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(e.target as Node)) {
+                    const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+                    const menu = dropdown.querySelector('[data-dropdown-menu]') as HTMLElement;
+                    if (trigger && menu) {
+                        closeDropdown(trigger, menu);
+                    }
+                }
+            });
+        };
+
+        // 键盘事件处理函数
+        const handleTriggerKeydown = (
+            e: KeyboardEvent,
+            trigger: HTMLElement,
+            menu: HTMLElement,
+            items: NodeListOf<HTMLElement>
+        ) => {
+            switch (e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    toggleDropdown(trigger, menu);
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    openDropdown(trigger, menu);
+                    if (items.length > 0) {
+                        items[0].focus();
+                    }
+                    break;
+                case 'Escape':
+                    closeDropdown(trigger, menu);
+                    break;
+            }
+        };
+
+        // 菜单项键盘导航处理
+        const handleItemKeydown = (
+            e: KeyboardEvent,
+            index: number,
+            items: NodeListOf<HTMLElement>,
+            trigger: HTMLElement,
+            menu: HTMLElement
+        ) => {
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    const nextIndex = (index + 1) % items.length;
+                    items[nextIndex].focus();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    const prevIndex = (index - 1 + items.length) % items.length;
+                    items[prevIndex].focus();
+                    break;
+                case 'Escape':
+                    closeDropdown(trigger, menu);
+                    trigger.focus();
+                    break;
+            }
+        };
+
+        // 初始化下拉菜单
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+            const menu = dropdown.querySelector('[data-dropdown-menu]') as HTMLElement;
+            const items = dropdown.querySelectorAll('.dropdown-item') as NodeListOf<HTMLElement>;
+
+            if (!trigger || !menu) return;
+
+            // 触发器键盘事件
+            trigger.addEventListener('keydown', (e) => {
+                handleTriggerKeydown(e as KeyboardEvent, trigger, menu, items);
+            });
+
+            // 菜单项键盘事件
+            items.forEach((item, index) => {
+                item.addEventListener('keydown', (e) => {
+                    handleItemKeydown(e as KeyboardEvent, index, items, trigger, menu);
+                });
+            });
+        });
+
+        document.addEventListener('click', handleDocumentClick);
+    });
+
+    // 下拉菜单状态管理
+    const toggleDropdown = (trigger: HTMLElement, menu: HTMLElement) => {
+        const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+        isOpen ? closeDropdown(trigger, menu) : openDropdown(trigger, menu);
+    };
+
+    const openDropdown = (trigger: HTMLElement, menu: HTMLElement) => {
+        trigger.setAttribute('aria-expanded', 'true');
+        updateMenuClasses(menu, false);
+    };
+
+    const closeDropdown = (trigger: HTMLElement, menu: HTMLElement) => {
+        trigger.setAttribute('aria-expanded', 'false');
+        updateMenuClasses(menu, true);
+    };
+
+    // 菜单类名管理
+    const updateMenuClasses = (menu: HTMLElement, isClosing: boolean) => {
+        const classesToAdd = isClosing
+            ? ['opacity-0', 'invisible', 'pointer-events-none', 'translate-y-[-8px]']
+            : ['opacity-100', 'visible', 'pointer-events-auto', 'translate-y-0'];
+
+        const classesToRemove = isClosing
+            ? ['opacity-100', 'visible', 'pointer-events-auto', 'translate-y-0']
+            : ['opacity-0', 'invisible', 'pointer-events-none', 'translate-y-[-8px]'];
+
+        menu.classList.remove(...classesToRemove);
+        menu.classList.add(...classesToAdd);
+    };
+</script>

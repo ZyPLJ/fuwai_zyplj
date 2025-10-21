@@ -93,6 +93,74 @@
         @apply text-black/25 dark:text-white/25
     }
 
+    /* 下拉菜单样式 */
+    .dropdown-container {
+        @apply relative;
+    }
+
+    .dropdown-menu {
+        @apply absolute top-full left-0 pt-2 opacity-0 invisible pointer-events-none transition-all duration-200 ease-out transform translate-y-[-8px] z-50;
+    }
+
+    .dropdown-container:hover .dropdown-menu,
+    .dropdown-container:focus-within .dropdown-menu {
+        @apply opacity-100 visible pointer-events-auto translate-y-0;
+    }
+
+    .dropdown-container:hover .dropdown-arrow,
+    .dropdown-container:focus-within .dropdown-arrow {
+        @apply rotate-180;
+    }
+
+    .dropdown-content {
+        @apply bg-[var(--float-panel-bg)] rounded-[var(--radius-large)] shadow-xl dark:shadow-none border border-black/5 dark:border-white/10 py-2 min-w-[12rem];
+    }
+
+    .dropdown-item {
+        @apply flex items-center justify-between px-4 py-2.5 text-black/75 dark:text-white/75 hover:text-[var(--primary)] hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-150 font-medium;
+    }
+
+    .dropdown-item:first-child {
+        @apply rounded-t-[calc(var(--radius-large)-0.5rem)];
+    }
+
+    .dropdown-item:last-child {
+        @apply rounded-b-[calc(var(--radius-large)-0.5rem)];
+    }
+
+    /* 移动端菜单样式 */
+    .mobile-submenu {
+        @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out;
+    }
+
+    .mobile-dropdown[data-expanded="true"] .mobile-submenu {
+        @apply max-h-96;
+    }
+
+    .mobile-dropdown[data-expanded="true"] .mobile-dropdown-arrow {
+        @apply rotate-180;
+    }
+
+    /* 响应式隐藏 */
+    @media (max-width: 768px) {
+        .dropdown-container {
+            @apply hidden;
+        }
+    }
+
+    /* 无障碍支持 */
+    .dropdown-container:focus-within .dropdown-menu {
+        @apply opacity-100 visible pointer-events-auto translate-y-0;
+    }
+
+    .dropdown-item:focus {
+        @apply outline-none;
+    }
+
+    .mobile-dropdown button:focus {
+        @apply outline-none;
+    }
+
     .meta-icon {
         @apply w-8 h-8 transition rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
         text-[var(--btn-content)] mr-2
@@ -141,12 +209,12 @@
 }
 
 .custom-md spoiler {
-  @apply bg-[var(--codeblock-bg)] hover:bg-transparent px-1 py-0.5 overflow-hidden rounded-md transition-all duration-150;
+    @apply bg-[var(--codeblock-bg)] hover:bg-transparent px-1 py-0.5 overflow-hidden rounded-md transition-all duration-150;
 
-  &:not(:hover) {
-    color: var(--codeblock-bg);
-    * {
+    &:not(:hover) {
         color: var(--codeblock-bg);
+        * {
+            color: var(--codeblock-bg);
+        }
     }
-  }
 }
