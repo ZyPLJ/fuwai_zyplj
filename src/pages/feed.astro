@@ -1,0 +1,10 @@
+---
+import FriendLinkFeed from "@components/FriendLinkFeed.svelte";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout title={i18n(I18nKey.feed) || "友链朋友圈"} description="展示友链博客的最新文章动态">
+    <FriendLinkFeed client:only="svelte"></FriendLinkFeed>
+</MainGridLayout>

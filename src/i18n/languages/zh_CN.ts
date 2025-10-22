@@ -7,6 +7,7 @@ export const zh_CN: Translation = {
 	[Key.archive]: "归档",
 	[Key.images]: "图片",
 	[Key.links]: "友链",
+	[Key.feed]: "友链朋友圈",
 	[Key.search]: "搜索",
 
 	[Key.tags]: "标签",

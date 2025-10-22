@@ -15,7 +15,9 @@
 3. 评论系统
 4. 友链页面
 5. 首图支持视频
-6. 多级菜单
+6. [图片页面](https://blog.pljzy.top/posts/%E5%8D%9A%E5%AE%A2%E7%AF%87%E6%96%B0%E5%A2%9E%E5%9B%BE%E7%89%87%E9%A1%B5%E9%9D%A2/%E5%8D%9A%E5%AE%A2%E7%AF%87%E6%96%B0%E5%A2%9E%E5%9B%BE%E7%89%87%E9%A1%B5%E9%9D%A2/) 
+7. [多级菜单](https://blog.pljzy.top/posts/%E7%BB%99%E5%8D%9A%E5%AE%A2%E6%B7%BB%E5%8A%A0%E5%A4%9A%E7%BA%A7%E8%8F%9C%E5%8D%95%E5%8A%9F%E8%83%BD/%E7%BB%99%E5%8D%9A%E5%AE%A2%E6%B7%BB%E5%8A%A0%E5%A4%9A%E7%BA%A7%E8%8F%9C%E5%8D%95%E5%8A%9F%E8%83%BD/)
+8. 友链朋友圈
 
 如果对于上述功能不感兴趣的可以直接`clone`原作者的仓库。
 

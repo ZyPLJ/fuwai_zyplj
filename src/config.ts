@@ -58,7 +58,7 @@ export const navBarConfig: NavBarConfig = {
 		{
 			name: "社交",
 			url: "/links/",
-			children: [LinkPreset.Links],
+			children: [LinkPreset.Links, LinkPreset.Feed], // 如果没有友链朋友圈功能，则注释掉
 		},
 		// LinkPreset.Images, // 如果没有lsky.pro图床，则注释掉 https://docs.lsky.pro/archive/free/v2/
 		{
@@ -117,4 +117,8 @@ export const imageLibraryConfig = {
 	albumsEndpoint: "/albums?order=earliest", // 相册列表接口
 	imagesEndpoint: "/images", // 图片列表接口
 	defaultAlbumId: 4, // 默认相册ID
+};
+
+export const friendLinkFeedConfig = {
+	apiUrl: "", // 友链朋友圈API地址 https://blog.liushen.fun/posts/4dc716ec/#%E7%88%AC%E5%8F%96%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2
 };
