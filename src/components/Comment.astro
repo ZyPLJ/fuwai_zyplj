@@ -3,42 +3,60 @@ import { commentConfig } from "src/config";
 ---
 
 {commentConfig.enable && (
-    <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full mb-4 text-black/80 dark:text-white/80" style="overflow: unset">
-        <div id="tcomment" class="twikoo-comment"></div>
-        <script is:inline define:vars={{ commentConfig }}>
-            function initTwikoo() {
-                twikoo.init({
-                    envId: commentConfig.twikoo.envId,
-                    el: '#tcomment',
-                    region: commentConfig.twikoo.region,
-                    path: location.pathname,
-                    lang: commentConfig.twikoo.lang,
-                    onCommentLoaded: function() {
-                        console.log('Twikoo comments loaded successfully');
+<div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full mb-4 text-black/80 dark:text-white/80" style="overflow: unset">
+    <div id="tcomment" class="twikoo-comment"></div>
+    <script is:inline define:vars={{ commentConfig }}>
+        function initTwikoo() {
+            twikoo.init({
+                envId: commentConfig.twikoo.envId,
+                el: '#tcomment',
+                region: commentConfig.twikoo.region,
+                path: location.pathname,
+                lang: commentConfig.twikoo.lang,
+                onCommentLoaded: function() {
+                    console.log('Twikoo comments loaded successfully');
+                    if (window.createPhotoSwipe){
+                        window.createPhotoSwipe()
+                    }
+                }
+            });
+            // 防止 twikoo 内部 a 标签 href="#" 导致页面跳到顶部
+            // todo: 不知道为啥会导致页面跳到顶部，暂时先用这种方式解决
+            // Prevent Twikoo's internal <a href="#"> tags from causing the page to scroll to the top.
+            const commentContainer = document.getElementById("twikoo");
+            if (commentContainer) {
+                commentContainer.addEventListener("click", function (e) {
+                    const selector = 'a[href="#"], svg, [class*="tk-action-"]';
+                    const targetElement = e.target.closest(selector);
+                    if (targetElement) {
+                        e.preventDefault();
+                        e.stopPropagation();
                     }
                 });
-                // 防止 twikoo 内部 a 标签 href="#" 导致页面跳到顶部
-                // todo: 不知道为啥会导致页面跳到顶部，暂时先用这种方式解决
-                // Prevent Twikoo's internal <a href="#"> tags from causing the page to scroll to the top.
-                const commentContainer = document.getElementById("twikoo");
-                if (commentContainer) {
-                    commentContainer.addEventListener("click", function (e) {
-                        const selector = 'a[href="#"], svg, [class*="tk-action-"]';
-                        const targetElement = e.target.closest(selector);
-                        if (targetElement) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                    });
-                }
             }
-            // https://twikoo.js.org/frontend.html CDN指南
-            const script = document.createElement('script');
-            script.src = 'https://registry.npmmirror.com/twikoo/1.6.44/files/dist/twikoo.min.js' 
-            script.onload = function() {
-                initTwikoo();
-            };
-            document.head.appendChild(script);
-        </script>
-    </div>
+            if (window.createPhotoSwipe){
+                // 动态创建样式并添加到页面
+                const style = document.createElement('style');
+                style.textContent = `
+                                            .tk-content img {
+                                                cursor: zoom-in;
+                                                transition: opacity 0.2s ease;
+                                            }
+                                            .tk-content img:hover {
+                                                opacity: 0.9;
+                                            }
+                                         `;
+                document.head.appendChild(style);
+                console.log("动态样式已添加到页面");
+            }
+        }
+        // https://twikoo.js.org/frontend.html CDN指南
+        const script = document.createElement('script');
+        script.src = 'https://registry.npmmirror.com/twikoo/1.6.44/files/dist/twikoo.min.js'
+        script.onload = function() {
+            initTwikoo();
+        };
+        document.head.appendChild(script);
+    </script>
+</div>
 )} 
