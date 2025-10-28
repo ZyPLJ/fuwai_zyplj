@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import path from "node:path";
 import { Icon } from "astro-icon/components";
+import { commentConfig } from "src/config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getDir } from "../utils/url-utils";
@@ -68,7 +69,7 @@ const { remarkPluginFrontmatter } = await entry.render();
             { description || remarkPluginFrontmatter.excerpt }
         </div>
 
-        <!-- word count and read time  -->
+        <!-- word count, read time and comment count  -->
         <div class="text-sm text-black/30 dark:text-white/30 flex gap-4 transition">
             <div>
                 {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
@@ -77,8 +78,16 @@ const { remarkPluginFrontmatter } = await entry.render();
             <div>
                 {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
             </div>
+            {commentConfig.enable && (
+                    <>
+                        <div>|</div>
+                        <span class="comment-count" data-path={url}>
+                        <span>0</span>
+                        <span>{i18n(I18nKey.commentsCount)}</span>
+                    </span>
+                    </>
+            )}
         </div>
-
     </div>
 
     {hasCover && <a href={url} aria-label={title}

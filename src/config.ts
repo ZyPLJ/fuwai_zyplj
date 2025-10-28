@@ -96,10 +96,10 @@ export const licenseConfig: LicenseConfig = {
 };
 
 export const commentConfig = {
-	enable: true,
+	enable: false,
 	provider: "twikoo",
 	twikoo: {
-		envId: "https://api.pljzy.top", // 移除末尾的斜杠
+		envId: "", // 移除末尾的斜杠
 		region: "",
 		lang: "zh-CN",
 	},

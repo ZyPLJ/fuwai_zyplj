@@ -19,6 +19,7 @@ import { defaultFavicons } from "../constants/icon";
 import type { Favicon } from "../types/config";
 import { pathsEqual, url } from "../utils/url-utils";
 import "katex/dist/katex.css";
+import { commentConfig } from "src/config";
 
 interface Props {
 	title?: string;
@@ -715,3 +716,16 @@ if (window.swup) {
 	document.addEventListener("swup:enable", setup)
 }
 </script>
+
+{commentConfig.enable && (
+	<>
+		<script is:inline define:vars={{ commentConfig }}>
+			window.commentConfig = commentConfig;
+			// 动态加载 Twikoo Loader（保证执行顺序）
+			const script = document.createElement('script');
+			script.src = '/scripts/twikoo-loader.js';
+			script.defer = true; // 延迟到 HTML 解析后执行
+			document.head.appendChild(script);
+		</script>
+	</>
+)}
