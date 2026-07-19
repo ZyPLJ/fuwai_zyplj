@@ -48,6 +48,22 @@ export const siteConfig: SiteConfig = {
 	musicPlayer: {
 		enable: true, // 是否启用音乐播放器
 	},
+	pet: {
+		enable: true, // 是否启用桌面宠物
+		// 可选: "firefly" | "fufu-sticker" | "ganyu-pet-v2" | "rich-paimon"
+		id: "rich-paimon",
+		// 雪碧图 CDN 完整 URL；留空则用本地 /pets/<id>/spritesheet.webp
+		// 例: "https://cdn.example.com/pets/rich-paimon/spritesheet.webp"
+		// 注意：CDN 需配置 CORS，否则 canvas 无法裁切帧
+		spritesheet: "",
+		scale: 0.5,
+		speed: 120,
+		position: "bottom-right",
+		margin: 20,
+		state: "idle",
+		draggable: true,
+		clickCycle: true,
+	},
 };
 
 export const navBarConfig: NavBarConfig = {

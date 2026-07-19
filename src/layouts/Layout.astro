@@ -278,6 +278,79 @@ const bannerOffset =
 			}
 		</script>
 		)}
+
+		{/* 桌面宠物 — mode:fixed 挂到 body，位于 Swup containers 之外，页面切换不重载 */}
+		{siteConfig.pet?.enable && (
+			<script
+				is:inline
+				define:vars={{
+					petId: siteConfig.pet.id,
+					petSpritesheet: siteConfig.pet.spritesheet ?? "",
+					petScale: siteConfig.pet.scale ?? 0.5,
+					petSpeed: siteConfig.pet.speed ?? 120,
+					petPosition: siteConfig.pet.position ?? "bottom-right",
+					petMargin: siteConfig.pet.margin ?? 20,
+					petState: siteConfig.pet.state ?? "idle",
+					petDraggable: siteConfig.pet.draggable ?? true,
+					petClickCycle: siteConfig.pet.clickCycle ?? true,
+				}}
+			>
+			(function () {
+				// 单例：Swup 只换 main/#toc，body 脚本与 fixed 节点都保留；
+				// 仍用 flag 防止极端情况下的重复挂载（整页刷新 / 缓存回退等）
+				if (window.__sitePetBooted) return;
+				window.__sitePetBooted = true;
+
+				const base = "/pets/" + petId + "/";
+				// spritesheet: 配置了 CDN 完整 URL 则用 CDN，否则回退本地
+				const sheet = (typeof petSpritesheet === "string" && petSpritesheet.trim())
+					? petSpritesheet.trim()
+					: base + "spritesheet.webp";
+				const config = {
+					petJson: base + "pet.json",
+					spritesheet: sheet,
+					mode: "fixed",
+					position: petPosition,
+					scale: petScale,
+					speed: petSpeed,
+					state: petState,
+					margin: petMargin,
+					draggable: petDraggable,
+					clickCycle: petClickCycle,
+					// 默认 zIndex 极高，略压低以免盖住弹层/播放器列表
+					zIndex: 40,
+					onReady: function (inst) {
+						window.sitePet = inst;
+					},
+					onError: function (err) {
+						console.error("[CodexPet]", err);
+					},
+				};
+
+				function mount() {
+					if (window.sitePet || !window.CodexPet) return;
+					window.sitePet = window.CodexPet.mount(document.body, config);
+				}
+
+				if (window.CodexPet) {
+					mount();
+					return;
+				}
+
+				const script = document.createElement("script");
+				script.src = "/lib/codex-pet.js";
+				script.async = true;
+				script.onload = mount;
+				script.onerror = function () {
+					console.error("[CodexPet] failed to load /lib/codex-pet.js");
+					window.__sitePetBooted = false;
+				};
+				document.head.appendChild(script);
+			})();
+			</script>
+		)}
+
+
 	</body>
 </html>
 

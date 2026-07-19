@@ -46,6 +46,39 @@ export type SiteConfig = {
 	musicPlayer: {
 		enable: boolean;
 	};
+
+	/**
+	 * Desktop pet (CodexPet) floating companion.
+	 * Assets live under public/pets/<id>/; SDK at public/lib/codex-pet.js.
+	 * Mounted once on body with mode:fixed so Swup page swaps do not remount it.
+	 */
+	pet: {
+		enable: boolean;
+		/** Folder name under /pets/, e.g. "rich-paimon" | "firefly" | "fufu-sticker" | "ganyu-pet-v2" */
+		id: string;
+		/**
+		 * Full URL of spritesheet.webp (CDN). Empty / omitted → local /pets/<id>/spritesheet.webp.
+		 * CDN must allow CORS (Access-Control-Allow-Origin) so canvas can crop frames.
+		 */
+		spritesheet?: string;
+		/** Display scale; 1 = native cell size (192×208) */
+		scale?: number;
+		/** ms per frame */
+		speed?: number;
+		/** Corner name or pixel coords */
+		position?:
+			| "bottom-right"
+			| "bottom-left"
+			| "top-right"
+			| "top-left"
+			| "center";
+		/** Corner margin in px */
+		margin?: number;
+		/** Initial animation state */
+		state?: string;
+		draggable?: boolean;
+		clickCycle?: boolean;
+	};
 };
 
 export type Favicon = {

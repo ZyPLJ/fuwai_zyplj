@@ -1,0 +1,9 @@
+{
+  "id": "rich-paimon",
+  "displayName": "Rich Paimon财神派蒙",
+  "description": "Rich Paimon财神派蒙, a tiny God-of-Wealth Codex pet.",
+  "spritesheetPath": "spritesheet.webp",
+  "kind": "object",
+  "source": "codex-pets.net",
+  "sourceId": "rich-paimon"
+}
