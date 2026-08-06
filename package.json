@@ -11,6 +11,7 @@
 		"astro": "astro",
 		"type-check": "tsc --noEmit --isolatedDeclarations",
 		"new-post": "node scripts/new-post.js",
+		"lqips": "npx tsx scripts/generate-lqips.ts",
 		"format": "biome format --write ./src",
 		"lint": "biome check --write ./src",
 		"preinstall": "npx only-allow pnpm"
@@ -36,6 +37,7 @@
 		"astro": "5.12.8",
 		"astro-expressive-code": "^0.41.3",
 		"astro-icon": "^1.1.5",
+		"ci-info": "^4.4.0",
 		"hastscript": "^9.0.1",
 		"katex": "^0.16.22",
 		"markdown-it": "^14.1.0",
@@ -69,8 +71,10 @@
 		"@types/markdown-it": "^14.1.2",
 		"@types/mdast": "^4.0.4",
 		"@types/sanitize-html": "^2.16.0",
+		"glob": "^13.0.6",
 		"postcss-import": "^16.1.1",
-		"postcss-nesting": "^13.0.2"
+		"postcss-nesting": "^13.0.2",
+		"tsx": "^4.23.9"
 	},
 	"packageManager": "pnpm@9.14.4"
 }

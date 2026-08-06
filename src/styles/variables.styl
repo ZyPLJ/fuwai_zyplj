@@ -100,3 +100,10 @@ define({
   --text-secondary: oklch(0.45 0.02 var(--hue)) oklch(0.75 0.01 var(--hue))
   --radius: 0.5rem
 })
+
+/* 1280px+ 布局为三列(左侧栏 17.5rem + 内容 + 右侧栏 17.5rem + 2 个 1rem 间距)，
+   文章页侧边目录改为浮在右侧栏之外，避免重叠；
+   容器宽度为 min(92vw, page-width)，目录宽度按实际容器宽度计算 */
+@media (min-width: 1280px)
+  :root
+    --toc-width: calc((100vw - min(92vw, var(--page-width)) - 18.5rem) / 2 - 1rem)

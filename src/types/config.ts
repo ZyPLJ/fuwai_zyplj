@@ -4,6 +4,9 @@ export type SiteConfig = {
 	title: string;
 	subtitle: string;
 
+	/** 站点开始日期（YYYY-MM-DD），用于侧边栏「站点统计」的运行天数计算 */
+	siteStartDate: string;
+
 	lang:
 		| "en"
 		| "zh_CN"
@@ -34,6 +37,16 @@ export type SiteConfig = {
 	toc: {
 		enable: boolean;
 		depth: 1 | 2 | 3;
+	};
+
+	/** 图片优化配置（移植自 Firefly，用于文章封面等 astro:assets 图片） */
+	imageOptimization: {
+		/** 生成的图片格式: "both" | "avif" | "webp" */
+		formats?: "both" | "avif" | "webp";
+		/** 压缩质量 1-100，默认 80 */
+		quality?: number;
+		/** 需要 referrerpolicy="no-referrer" 的域名通配符列表（防盗链 403），如 ["*.example.com"] */
+		noReferrerDomains?: string[];
 	};
 
 	favicon: Favicon[];

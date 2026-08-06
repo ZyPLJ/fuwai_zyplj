@@ -2,7 +2,10 @@
 import BackToTop from "@components/control/BackToTop.astro";
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
+import Calendar from "@components/widget/Calendar.astro";
 import SideBar from "@components/widget/SideBar.astro";
+import SiteInfo from "@components/widget/SiteInfo.astro";
+import SiteStats from "@components/widget/SiteStats.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "../components/misc/ImageWrapper.astro";
@@ -45,7 +48,7 @@ const mainPanelTop = siteConfig.banner.enable
 
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>
-<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto" class:list={[""]}>
+<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 w-full xl:w-[92vw] max-w-[var(--page-width)] px-0 md:px-4 mx-auto" class:list={[""]}>
     <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
         <Navbar></Navbar>
     </div>
@@ -62,8 +65,8 @@ const mainPanelTop = siteConfig.banner.enable
 <!-- Main content -->
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
-    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
+    <div class="relative w-full xl:w-[92vw] max-w-[var(--page-width)] mx-auto pointer-events-auto">
+        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] xl:grid-cols-[17.5rem_1fr_17.5rem] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
     mx-auto gap-4 px-0 md:px-4"
         >
             <!-- Banner image credit -->
@@ -82,7 +85,7 @@ const mainPanelTop = siteConfig.banner.enable
 
             <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation" headings={headings}></SideBar>
 
-            <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 overflow-hidden">
+            <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 xl:col-start-2 overflow-hidden">
                 <div id="content-wrapper" class="onload-animation">
                     <!-- the overflow-hidden here prevent long text break the layout-->
                     <!-- make id different from windows.swup global property -->
@@ -92,6 +95,23 @@ const mainPanelTop = siteConfig.banner.enable
                     </div>
                 </div>
             </main>
+
+            <!-- 右侧栏(站点统计/站点信息/日历):同一容器跨断点复用。
+                 xl 及以上:位于第 3 列(统计/信息随页面滚动,日历 sticky 贴顶);
+                 <xl:网格自动放置到内容底部整行(相当于 Firefly 的 mobileBottomComponents,
+                 但 Calendar 只渲染一次,避免固定 id 与 getElementById 冲突) -->
+            <div id="right-sidebar" class="flex flex-col w-full gap-4 mb-4 col-span-2 xl:col-span-1 xl:row-start-1 xl:col-start-3 xl:max-w-[17.5rem]">
+                <div class="flex flex-col w-full gap-4">
+                    <SiteStats class="onload-animation" style="animation-delay: 100ms"></SiteStats>
+                    <SiteInfo class="onload-animation" style="animation-delay: 150ms"></SiteInfo>
+                </div>
+                <!-- 日历 sticky(仅 xl):滚动时固定在视口顶部(贴顶),页面滑动到底部时仍保持固定。
+                     与左侧栏 #sidebar-sticky 一致:主页 banner 开启时 #main-grid 被 translate-y 下移 --banner-height-extend,
+                     需在 Layout.astro 中对该容器做同样的 top 补偿(见 #right-sidebar-sticky 规则) -->
+                <div id="right-sidebar-sticky" class="flex flex-col w-full gap-4 xl:sticky xl:top-4">
+                    <Calendar class="onload-animation" style="animation-delay: 200ms"></Calendar>
+                </div>
+            </div>
 
             <div class="footer col-span-2 onload-animation block lg:hidden">
                 <Footer></Footer>
@@ -104,7 +124,7 @@ const mainPanelTop = siteConfig.banner.enable
 
 <!-- The things that should be under the banner, only the TOC for now -->
 <div class="absolute w-full z-0 hidden 2xl:block">
-    <div class="relative max-w-[var(--page-width)] mx-auto">
+    <div class="relative w-full xl:w-[92vw] max-w-[var(--page-width)] mx-auto">
         <!-- TOC component -->
         {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] items-center",
             {"toc-hide": siteConfig.banner.enable}]}

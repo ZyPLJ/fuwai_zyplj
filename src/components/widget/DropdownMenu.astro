@@ -27,16 +27,17 @@ const hasChildren = processedLink.children && processedLink.children.length > 0;
 
 <div class:list={["dropdown-container", className]} data-dropdown>
 	{hasChildren ? (
-		<button 
-			class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95 dropdown-trigger"
+		<button
+			class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95 dropdown-trigger relative"
 			aria-expanded="false"
 			aria-haspopup="true"
 			data-dropdown-trigger
 		>
 			<div class="flex items-center">
 				{processedLink.name}
-				<Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition-transform duration-200 dropdown-arrow ml-1" />
 			</div>
+			<!-- 箭头 absolute 定位不占布局宽度,保证按钮与其他菜单项等宽,右边缘对齐 -->
+			<Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition-transform duration-200 dropdown-arrow absolute right-2 top-1/2 -translate-y-1/2" />
 		</button>
 		<div class="dropdown-menu" data-dropdown-menu>
 			<div class="dropdown-content">

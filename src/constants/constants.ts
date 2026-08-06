@@ -14,4 +14,5 @@ export const BANNER_HEIGHT_HOME = BANNER_HEIGHT + BANNER_HEIGHT_EXTEND;
 export const MAIN_PANEL_OVERLAPS_BANNER_HEIGHT = 3.5;
 
 // Page width: rem
-export const PAGE_WIDTH = 75;
+// 90rem 容纳三列布局(左侧栏 17.5rem + 内容 + 右侧栏 17.5rem)时内容区仍有 ~53rem
+export const PAGE_WIDTH = 90;

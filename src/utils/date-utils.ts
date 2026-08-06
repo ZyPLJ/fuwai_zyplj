@@ -5,8 +5,11 @@ export function formatDateToYYYYMMDD(date: Date): string {
 }
 
 // 国际化日期格式化函数
-export function formatDateI18n(dateString: string): string {
-	const date = new Date(dateString);
+export function formatDateI18n(
+	dateInput: Date | string,
+	includeTime?: boolean,
+): string {
+	const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
 	const lang = siteConfig.lang || "en";
 
 	// 根据语言设置不同的日期格式
@@ -15,6 +18,12 @@ export function formatDateI18n(dateString: string): string {
 		month: "long",
 		day: "numeric",
 	};
+
+	if (includeTime) {
+		options.hour = "2-digit";
+		options.minute = "2-digit";
+		options.second = "2-digit";
+	}
 
 	// 语言代码映射
 	const localeMap: Record<string, string> = {
@@ -35,5 +44,12 @@ export function formatDateI18n(dateString: string): string {
 	};
 
 	const locale = localeMap[lang] || "en-US";
-	return date.toLocaleDateString(locale, options);
+	return includeTime
+		? date.toLocaleString(locale, options)
+		: date.toLocaleDateString(locale, options);
+}
+
+// 国际化日期时间格式化函数（带时分秒）
+export function formatDateI18nWithTime(dateInput: Date | string): string {
+	return formatDateI18n(dateInput, true);
 }

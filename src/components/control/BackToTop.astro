@@ -26,19 +26,20 @@ import { Icon } from "astro-icon/components";
     font-weight: bold
     border: none
     position: fixed
+    right: 1.25rem
     bottom: 10rem
     opacity: 1
     cursor: pointer
-    transform: translateX(5rem)
+    transform: translateX(0)
     pointer-events: auto
     i
         font-size: 1.75rem
     &.hide
-        transform: translateX(5rem) scale(0.9)
+        transform: translateX(calc(100% + 1.5rem))
         opacity: 0
         pointer-events: none
     &:active
-      transform: translateX(5rem) scale(0.9)
+      transform: translateX(0) scale(0.9)
 
 </style>
 

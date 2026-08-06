@@ -11,6 +11,7 @@ export const siteConfig: SiteConfig = {
 	title: "ZY知识库",
 	subtitle: "欢迎来到我的博客",
 	lang: "zh_CN", // 'en', 'zh_CN', 'zh_TW', 'ja', 'ko', 'es', 'th'
+	siteStartDate: "2023-04-08", // 站点开始日期，用于侧边栏「站点统计」计算运行天数，请改成博客实际建立日期
 	themeColor: {
 		hue: 250, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
 		fixed: false, // Hide the theme color picker for visitors
@@ -32,6 +33,11 @@ export const siteConfig: SiteConfig = {
 	toc: {
 		enable: true, // Display the table of contents on the right side of the post
 		depth: 2, // Maximum heading depth to show in the table, from 1 to 3
+	},
+	imageOptimization: {
+		formats: "both", // 文章封面生成的格式: "both" | "avif" | "webp"
+		quality: 80, // 封面压缩质量 1-100
+		noReferrerDomains: [], // 需要 referrerpolicy="no-referrer" 的域名（防盗链），如 ["*.example.com"]
 	},
 	favicon: [
 		// Leave this array empty to use the default favicon
