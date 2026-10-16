@@ -77,6 +77,7 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Home,
 		LinkPreset.Archive,
 		LinkPreset.About,
+		LinkPreset.Moments, // 动态页（需先配置 commentConfig 与 momentsConfig）
 		{
 			name: "社交",
 			url: "/links/",
@@ -143,4 +144,10 @@ export const imageLibraryConfig = {
 
 export const friendLinkFeedConfig = {
 	apiUrl: "", // 友链朋友圈API地址 https://blog.liushen.fun/posts/4dc716ec/#%E7%88%AC%E5%8F%96%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2
+};
+
+export const momentsConfig = {
+	enable: true, // 是否开启动态页
+	pageSize: 10, // 每批加载的动态条数
+	publishPath: "/moments/publish/", // 站长发动态用的 Twikoo path
 };

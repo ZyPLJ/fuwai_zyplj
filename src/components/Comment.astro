@@ -52,7 +52,8 @@ import { commentConfig } from "src/config";
         }
         // https://twikoo.js.org/frontend.html CDN指南
         const script = document.createElement('script');
-        script.src = 'https://registry.npmmirror.com/twikoo/1.6.44/files/dist/twikoo.min.js'
+        // 前端版本需与云函数版本一致，且与 /lib/twikoo.css 配套（当前 1.7.20）
+        script.src = 'https://registry.npmmirror.com/twikoo/1.7.20/files/dist/twikoo.min.js'
         script.onload = function() {
             initTwikoo();
         };

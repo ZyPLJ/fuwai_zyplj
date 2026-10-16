@@ -8,6 +8,7 @@ export const vi: Translation = {
 	[Key.images]: "Hình ảnh",
 	[Key.links]: "Liên kết",
 	[Key.feed]: "Nguồn bạn bè",
+	[Key.moments]: "Khoảnh khắc",
 	[Key.search]: "Tìm kiếm",
 
 	[Key.tags]: "Thẻ",

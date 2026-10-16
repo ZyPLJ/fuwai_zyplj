@@ -3,14 +3,16 @@ import BackToTop from "@components/control/BackToTop.astro";
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
 import Calendar from "@components/widget/Calendar.astro";
+import LatestDynamics from "@components/widget/LatestDynamics.svelte";
 import SideBar from "@components/widget/SideBar.astro";
 import SiteInfo from "@components/widget/SiteInfo.astro";
 import SiteStats from "@components/widget/SiteStats.astro";
+import WidgetLayout from "@components/widget/WidgetLayout.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "../components/misc/ImageWrapper.astro";
 import TOC from "../components/widget/TOC.astro";
-import { siteConfig } from "../config";
+import { commentConfig, momentsConfig, siteConfig } from "../config";
 import {
 	BANNER_HEIGHT,
 	BANNER_HEIGHT_EXTEND,
@@ -102,8 +104,14 @@ const mainPanelTop = siteConfig.banner.enable
                  但 Calendar 只渲染一次,避免固定 id 与 getElementById 冲突) -->
             <div id="right-sidebar" class="flex flex-col w-full gap-4 mb-4 col-span-2 xl:col-span-1 xl:row-start-1 xl:col-start-3 xl:max-w-[17.5rem]">
                 <div class="flex flex-col w-full gap-4">
-                    <SiteStats class="onload-animation" style="animation-delay: 100ms"></SiteStats>
-                    <SiteInfo class="onload-animation" style="animation-delay: 150ms"></SiteInfo>
+                    {commentConfig.enable && momentsConfig.enable && (
+                        <!-- 最新动态卡片:与站点统计行为一致(文章详情页随 #right-sidebar 一起隐藏),位于右栏最上 -->
+                        <WidgetLayout id="latest-dynamics" name="最新动态" class="onload-animation" style="animation-delay: 100ms">
+                            <LatestDynamics client:visible />
+                        </WidgetLayout>
+                    )}
+                    <SiteStats class="onload-animation" style="animation-delay: 150ms"></SiteStats>
+                    <SiteInfo class="onload-animation" style="animation-delay: 200ms"></SiteInfo>
                 </div>
                 <!-- 日历 sticky(仅 xl):滚动时固定在视口顶部(贴顶),页面滑动到底部时仍保持固定。
                      与左侧栏 #sidebar-sticky 一致:主页 banner 开启时 #main-grid 被 translate-y 下移 --banner-height-extend,

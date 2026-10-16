@@ -1,0 +1,18 @@
+---
+import MomentsPanel from "@components/MomentsPanel.svelte";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import avatar from "@/assets/images/logo.jpg";
+import { commentConfig, momentsConfig } from "@/config";
+---
+
+<MainGridLayout title={i18n(I18nKey.moments)} description="站长的最新动态与碎碎念">
+	{momentsConfig.enable && commentConfig.enable ? (
+		<MomentsPanel client:only="svelte" avatar={avatar.src} />
+	) : (
+		<div class="card-base rounded-[var(--radius-large)] py-16 text-center text-[var(--text-secondary)]">
+			动态功能未开启
+		</div>
+	)}
+</MainGridLayout>

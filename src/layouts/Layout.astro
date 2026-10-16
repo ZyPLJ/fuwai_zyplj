@@ -151,6 +151,12 @@ const bannerOffset =
 			<link href="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
 		)}
 
+		{/* Twikoo 评论样式：静态引入，避免 swup 切页时 head 更新清掉 twikoo.min.js 动态注入的样式。
+		    必须用同源文件（public/lib/twikoo.css，构建时随站点部署），且版本需与 twikoo.min.js 一致 */}
+		{commentConfig.enable && (
+			<link href="/lib/twikoo.css" rel="stylesheet">
+		)}
+
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 		{/* Microsoft Clarity 分析脚本 */}
@@ -801,7 +807,7 @@ if (window.swup) {
 			window.commentConfig = commentConfig;
 			// 动态加载 Twikoo Loader（保证执行顺序）
 			const script = document.createElement('script');
-			script.src = '/scripts/twikoo-loader.js';
+			script.src = '/lib/twikoo-loader.js';
 			script.defer = true; // 延迟到 HTML 解析后执行
 			document.head.appendChild(script);
 		</script>

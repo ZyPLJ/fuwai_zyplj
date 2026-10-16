@@ -22,7 +22,8 @@
 
 		window.twikoo
 			.getCommentsCount({
-				envId: twikooConfig.envId || "https://api.pljzy.top", // 默认值作为回退
+				// envId 取 src/config.ts 的 commentConfig.twikoo.envId，未配置时为空（不再内置默认地址）
+				envId: twikooConfig.envId || "",
 				region: twikooConfig.region || "",
 				urls: paths,
 				includeReply: true,
@@ -48,7 +49,7 @@
 				window.twikooLoading = true;
 				const script = document.createElement("script");
 				script.src =
-					"https://registry.npmmirror.com/twikoo/1.6.44/files/dist/twikoo.min.js";
+					"https://registry.npmmirror.com/twikoo/1.7.20/files/dist/twikoo.min.js";
 				script.onload = () => {
 					window.twikooLoaded = true;
 					loadTwikooCommentCount();
